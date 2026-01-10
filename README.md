@@ -11,7 +11,10 @@ Complete documentation of self-managed infrastructure supporting creative worklo
 - **Backup**: BorgBackup with 6-month retention
 - **Network**: 192.168.1.0/24 with local .bear domain
 - **AI/ML**: Ollama for local LLM inference, Stable Diffusion for image generation
-- **Uptime**: [Your actual uptime]
+- ### Server Performance Baseline
+* **Uptime:** 60 days, 20 minutes
+* **Active Users:** 3
+* **Load Average:** 4.62 (1 min) / 4.74 (5 min) / 3.99 (15 min)
 
 ## Architecture at a Glance
 
@@ -92,7 +95,7 @@ All services run on Proxmox with automated backups to ZFS storage. Remote access
 
 **Ollama**
 - Local LLM inference server
-- Running models: [Your specific models, e.g., llama3, mistral, etc.]
+- Running models: wen2.5-coder:32b, qwen2.5:14b, llama3.2:3b
 - Privacy-focused (all processing local)
 - API compatible with OpenAI format
 - Integration with Home Assistant via Claude MCP
@@ -152,7 +155,8 @@ See [NETWORK_TOPOLOGY.md](NETWORK_TOPOLOGY.md) for detailed network diagram and 
 - Router/Gateway: 192.168.1.1
 - Proxmox Host (deadmall): 192.168.1.29
 - Nextcloud: 192.168.1.19
-- [Other services]: [Document your IPs]
+- Digital Garde: 192.168.1.41
+- Printer: 192.168.1.41: 
 
 **DNS (.bear domain)**:
 - cloud.bear → Nextcloud
