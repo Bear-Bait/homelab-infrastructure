@@ -152,37 +152,49 @@ All services run on Proxmox with automated backups to ZFS storage. Remote access
 See [NETWORK_TOPOLOGY.md](NETWORK_TOPOLOGY.md) for detailed network diagram and IP assignments.
 
 **IP Assignments**:
-- Router/Gateway: 192.168.1.1
-- Proxmox Host (deadmall): 192.168.1.29
-- Nextcloud: 192.168.1.19
-- Digital Garde: 192.168.1.41
-- Printer: 192.168.1.41: 
+  - Router/Gateway: 192.168.1.1
+  - Proxmox Host (deadmall): 192.168.1.29
+  - Transmission: 192.168.1.29:9091
+  - Plex Media: 192.168.1.40:32400
+  - Printer: 192.168.1.41:631
+  - Raspberry Pi Hub: 10.147.17.15
+  - Calendar Submit: 10.147.17.15
+  - Destiny's Chores: 10.147.17.15
+  - Herb Garden Tracker: 10.147.17.15:3000
+  - Nextcloud: cloud.bear
+  - Bear Wiki: wiki.bear
+  - Ollama AI: ollama.bear:11434
+  - Family Chat App: 10.147.17.139:5000/
 
 **DNS (.bear domain)**:
-- cloud.bear → Nextcloud
-- deadmall.bear → Proxmox
-- [Add your other hosts]
+  - cloud.bear → Nextcloud
+  - deadmall.bear → Proxmox
+  - home.bear → Home Dashboard
+  - mail.bear → Mail Server
+  - office.bear → Collabora Online
+  - ollama.bear → Ollama AI
 
+wiki.bear → MediaWiki
 ## Hardware Inventory
 
 ### Primary Server (deadmall)
 
-- **CPU**: [Your CPU model and specs]
+- **CPU**: 15
 - **RAM**: 64GB DDR4
 - **Storage**: 8TB+ ZFS mirrored pool
 - **Network**: Gigabit Ethernet
-- **GPU**: [Your GPU for passthrough]
+- **GPU**: RTX 3090
 - **Role**: Proxmox hypervisor, all VMs
 
 ### Raspberry Pi Hub
 
-- **Model**: [Your Pi model]
-- **Purpose**: Pi-hole DNS, Home Assistant, lightweight services
+- **Model**: 
+- **Purpose**: Pi-hole DNS, Home Assistant, lightweight services, gallery video looper 
 - **Network**: Ethernet connected
 
 ### Client Devices
 
-- **Workstations**: [Your devices]
+- **Workstations**: EmacsOS
 - **Mobile**: Tailscale for remote access
 - **Smart home**: Various IoT devices
 
@@ -251,10 +263,3 @@ This repository provides the overview. For detailed documentation:
 - Creative workload optimization (audio DAW infrastructure)
 - Local AI/ML deployment (Ollama + Stable Diffusion)
 - Home Assistant + Claude MCP integration
-
-## Future Plans
-
-- [Document your planned improvements]
-- [Capacity expansion plans]
-- [New services to deploy]
-- [Infrastructure upgrades]
