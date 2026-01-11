@@ -161,7 +161,6 @@ See [NETWORK_TOPOLOGY.md](NETWORK_TOPOLOGY.md) for the complete diagram.
 - **Infrastructure**: Deployed RTX 3090 with stable PCI-Passthrough for AI workloads.
 - **Virtualization**: Migrated physical Raspberry Pi services (Pi-hole, HA) to Proxmox VMs for better reliability.
 - **Automation**: Implemented "Claude MCP" for natural language control of home automation.
-- **Certification**: Akamai Network Engineering Certification (Dec 2024).
 
 <!-- Local Variables: -->
 <!-- gptel-model: claude-haiku-4-5-20251001 -->
