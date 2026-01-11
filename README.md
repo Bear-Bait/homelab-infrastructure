@@ -5,7 +5,7 @@ Complete documentation of self-managed infrastructure supporting creative worklo
 ## Quick Stats
 
 - **Hypervisor**: Proxmox VE 8.4 (Host: `deadmall` @ 192.168.1.29)
-- **Compute**: Intel Core i5-6500 + NVIDIA RTX 3090 (24GB VRAM)
+- **Compute**: Intel Core i5-6500 + NVIDIA RTX 3090 (Offsite)
 - **RAM**: 64GB DDR4 (Production & Lab Allocation)
 - **Storage**: 8TB ZFS Pool (Single vDev) + 8TB Cold Spare
 - **Services**: 10+ active production workloads
