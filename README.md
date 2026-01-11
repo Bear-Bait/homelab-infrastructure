@@ -27,8 +27,8 @@ All core services (DNS, Storage, Automation) are virtualized on Proxmox for reli
     ↓                   ↓                   ↓
   Proxmox      Raspberry Pi Hub     Home Automation
 (Hypervisor)  (Portal, DNS, Audio)   (Light control)
-    ├─ emacsOS     └─ Pi-hole DNS       ↓
-    ├─ Nextcloud   └─ Home Assistant   Climate control
+    ├─ Pi-hole DNS └─EmacsOS        ↓
+    ├─ Nextcloud   └─ Volumio   Climate control
     ├─ Plex        └─ Tailscale        Motion detection
     ├─ Ollama                           CCTV integration
     ├─ Stable Diffusion
