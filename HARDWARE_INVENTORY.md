@@ -1,309 +1,111 @@
-# Hardware Inventory
+# Hardware Inventory & Infrastructure
 
-Complete inventory of all hardware in the homelab infrastructure.
+Living documentation of the homelab hardware, network topology, and resource allocation.
 
 ## Primary Server: deadmall
 
-### Specifications
+**System Information**
+- **Hostname**: `deadmall`
+- **Model**: Dell OptiPlex 5050 (Modified)
+- **Role**: Proxmox VE Hypervisor
+- **OS**: Proxmox VE 8.4.16 (Kernel 6.8.12-10-pve)
+- **Uptime**: > 60 days
+- **IP Address**: `192.168.1.29`
 
-**System Information**:
-- **Hostname**: deadmall
-- **IP Address**: 192.168.1.29
-- **Role**: Proxmox hypervisor (primary infrastructure host)
-- **OS**: Proxmox VE [Your version]
-- **Uptime**: [Your typical uptime]
+**Compute & Graphics**
+- **CPU**: Intel Core i5-6500 @ 3.20 GHz (4 Cores / 4 Threads)
+- **GPU**: NVIDIA GeForce RTX 3090 (24 GB GDDR6X)
+  - *Driver*: NVIDIA Linux Driver (Passthrough enabled)
+  - *Purpose*: Local LLM Inference (Ollama), Stable Diffusion, Audio DSP
+- **Memory**: 64 GB DDR4 2133 MT/s (4x 16GB Config)
 
-**CPU**:
-- **Model**: [Your CPU model, e.g., Intel Xeon E5-2680 v4]
-- **Cores**: [Number of physical cores]
-- **Threads**: [Number of threads]
-- **Base Clock**: [Clock speed]
-- **Features**: VT-x/VT-d for virtualization, [other features]
+**Storage Configuration**
+- **Boot Drive**: 60 GB Generic Flash Storage
+- **Fast Storage**: 1 TB Crucial P3 NVMe (VM Boot Disks & Cache)
+- **Bulk Storage**:
+  - **Active**: 8 TB Seagate BarraCuda (`/dev/sda`) - *Single vDev ZFS Pool*
+  - **Cold Spare**: 8 TB Seagate IronWolf (`/dev/sdb`) - *Mounted/Standby*
+- **Filesystem**: ZFS (Pool: `bearden`)
 
-**Memory**:
-- **Total RAM**: 64GB
-- **Type**: DDR4
-- **Speed**: [Speed, e.g., 2400MHz]
-- **Configuration**: [e.g., 4x 16GB DIMMs]
-- **ECC**: [Yes/No]
+**Networking**
+- **Interface**: Intel I219-V Gigabit Ethernet
+- **Bridge**: `vmbr0` (Standard Linux Bridge)
 
-**Storage**:
-- **Boot Drive**: [Your boot drive, e.g., 120GB SSD]
-- **ZFS Pool**:
-  - Drive 1: [Model, size, e.g., 8TB WD Red]
-  - Drive 2: [Model, size, e.g., 8TB WD Red]
-  - RAID Level: Mirror (RAID-1)
-  - Total Capacity: 8TB usable
-  - Filesystem: ZFS
+**Power & Cooling**
+- **Power Supply**: Custom Power Delivery [High-Wattage Configuration for GPU]
+- **Cooling**: Stock CPU cooler + Custom airflow management
 
-**GPU**:
-- **Model**: [Your GPU, e.g., NVIDIA GTX 1080]
-- **VRAM**: [VRAM amount]
-- **Purpose**: Passthrough for Stable Diffusion and Audio Production VMs
-- **Driver**: [Driver version on VMs]
-
-**Network**:
-- **Ethernet**: [Your NIC, e.g., Intel i219-V Gigabit]
-- **Speed**: Gigabit (1000 Mbps)
-- **Ports**: [Number of ports]
-- **MAC Address**: [Your MAC]
-
-**Power Supply**:
-- **Wattage**: [Your PSU wattage]
-- **Efficiency**: [80+ rating]
-
-**Cooling**:
-- **CPU Cooler**: [Your cooler]
-- **Case Fans**: [Number and configuration]
-
-### Hardware Health
-
-**Disk Health** (S.M.A.R.T status):
-```bash
-# Check with: smartctl -a /dev/sdX
-
-Drive 1: PASSED
-Drive 2: PASSED
-Last check: [Date]
-```
-
-**Temperature Monitoring**:
-- CPU: [Typical temperature range]
-- GPU: [Typical temperature range]
-- Drives: [Typical temperature range]
-
-**Power Consumption**:
-- Idle: [Watts]
-- Under load: [Watts]
-- Average: [Watts]
+---
 
 ## Secondary Devices
 
-### Raspberry Pi Hub
+### Raspberry Pi (Primary)
+- **Model**: Raspberry Pi 5
+- **Specs**: 8 GB RAM / 1 TB Storage
+- **Hostname**: `[emacs-pi]`
+- **IP Address**: `192.168.1.26`
+- **Role**: emacsOS / Dedicated Writing Machine
+- **Network**: Gigabit Ethernet
 
-**Model**: [Your Pi model, e.g., Raspberry Pi 4 Model B]
-- **RAM**: [e.g., 4GB/8GB]
-- **Storage**: [microSD size or SSD]
-- **Network**: Ethernet (Gigabit)
-- **IP Address**: [Your Pi IP]
-- **Purpose**: Pi-hole DNS, Home Assistant, lightweight services
-- **Power**: [Power supply specs]
+### Network Infrastructure
+- **Router**: Gateway @ `192.168.1.1`
+- **Subnet**: `192.168.1.0/24`
+- **DNS**: Pi-hole (Virtualized) -> Cloudflare 1.1.1.1
+- **Overlay**: ZeroTier (`10.147.17.x`) for remote administration
 
-### Network Equipment
+---
 
-**Router**:
-- **Model**: [Your router model]
-- **IP Address**: 192.168.1.1
-- **Features**: [NAT, DHCP, firewall, etc.]
-- **Wireless**: [Wireless specs if applicable]
+## Service Inventory & Resource Allocation
 
-**Switch** (if applicable):
-- **Model**: [Your switch model]
-- **Ports**: [Number of ports]
-- **Speed**: Gigabit
-- **Features**: [Managed/unmanaged, VLAN support, etc.]
+### Active Virtual Infrastructure (Proxmox)
 
-### Client Workstations
+| VMID | Service | Type | IP Address | Resource Allocation |
+|------|---------|------|------------|---------------------|
+| **102** | **Nextcloud** | VM | `192.168.1.19` | 12GB RAM / 1TB Disk |
+| **100** | **Plex Media Server** | VM | `192.168.1.40` | 4GB RAM / 32GB Disk |
+| **101** | **Pi-hole (DNS)** | VM | `192.168.1.15` | 4GB RAM / 20GB Disk |
+| **200** | **Ollama (AI)** | LXC | `192.168.1.50` | Shared Kernel / Host GPU |
+| **105** | **Wiki** | LXC | `192.168.1.18` | Shared Kernel |
+| **106** | **Forest Creatures** | VM | *DHCP* | 4GB RAM / 64GB Disk |
+| **107** | **Home Assistant** | VM | *Internal* | 4GB RAM / 32GB Disk |
 
-**Primary Workstation**:
-- **OS**: [macOS/Linux/Windows]
-- **CPU**: [CPU model]
-- **RAM**: [RAM amount]
-- **Storage**: [Storage config]
-- **Network**: [Connection type]
-- **Purpose**: Daily work, access to homelab services
+### Maintenance / Standby Services
 
-**Other Devices**:
-- [List other devices that connect to your homelab]
+| VMID | Service | Status | Notes |
+|------|---------|--------|-------|
+| **103** | Mail | Stopped | IP Reserved: `.25` |
+| **104** | Desktop-Ubuntu | Stopped | Reserved for GUI Tasks |
+| **108** | Urbit | Stopped | |
 
-### Smart Home Devices
+---
 
-**Automation Hub**:
-- Home Assistant on [Device]
-
-**Connected Devices**:
-- Smart lights: [Number and types]
-- Sensors: [Motion, temperature, etc.]
-- Cameras: [CCTV cameras]
-- Other: [Additional smart home devices]
-
-## Hardware Expansion History
-
-| Date | Change | Reason | Cost |
-|------|--------|--------|------|
-| [Date] | Added 64GB RAM | Support more VMs | $[Cost] |
-| [Date] | Added [GPU] | Stable Diffusion and audio DSP | $[Cost] |
-| [Date] | Added 2x 8TB drives | ZFS mirrored storage | $[Cost] |
-| [Date] | [Other changes] | [Reason] | $[Cost] |
-
-## Hardware Decisions
+## Architectural Decisions
 
 ### Why 64GB RAM?
+**Requirement**: Mixed-use Production & Lab environment.
+- **Allocation**: ~28GB is permanently reserved for active infrastructure (Nextcloud, Plex, Pi-hole).
+- **AI/ML**: The remaining ~36GB provides necessary headroom for loading large models into memory before offloading to the GPU, preventing OOM kills during heavy inference tasks.
 
-**Requirement**: Running multiple VMs simultaneously
-- Nextcloud: 16GB
-- Audio Production: 24GB
-- Ollama: [XGB]
-- Stable Diffusion: [XGB]
-- Dev environments: 8-16GB
-- Host overhead: 8GB
+### Why Single Drive ZFS?
+**Current Strategy**: Capacity over Redundancy.
+- The system currently utilizes a single 8TB ZFS vDev to maximize usable space.
+- **Risk Mitigation**: Essential configuration and documents are backed up externally.
+- **Future Plan**: A matching 8TB IronWolf is physically installed and ready to be added to the pool as a Mirror (RAID-1) vDev when the storage policy changes.
 
-**Total needed**: ~56GB minimum, 64GB provides headroom
+### Why NVIDIA RTX 3090?
+**Critical Spec**: 24GB VRAM.
+- **Local LLMs**: Enables running unquantized 30B+ parameter models locally via Ollama, which is impossible on consumer cards with 8-12GB VRAM.
+- **Stable Diffusion**: Provides the necessary buffer for high-resolution generation and LoRA training.
+- **Value**: Offers near-datacenter inference performance for a fraction of the cost of A100/H100 hardware.
 
-### Why ZFS Mirror (RAID-1)?
-
-**vs RAID-Z**:
-- Easier expansion (add mirror pairs)
-- Faster resilver times
-- Better random I/O performance
-- Acceptable space overhead (50%)
-
-**vs RAID-0**:
-- Data protection (1 drive can fail)
-- Critical for creative work
-
-### Why GPU Passthrough?
-
-**Use cases**:
-- Stable Diffusion inference (requires GPU)
-- Audio production DSP acceleration
-- Video transcoding
-- Future ML workloads
-
-**Alternative considered**: CPU-only (too slow for image generation)
-
-### Why Raspberry Pi for Pi-hole?
-
-**Advantages**:
-- Low power consumption (runs 24/7)
-- Dedicated device (no VM overhead)
-- Easy to maintain
-- Cheap and reliable
-
-## Future Hardware Plans
-
-### Short-term (Next 6 months)
-
-- [ ] [Planned hardware additions]
-- [ ] [Upgrades to existing hardware]
-
-### Long-term (1-2 years)
-
-- [ ] Storage expansion: Add 2x 16TB drives (second mirror)
-- [ ] RAM upgrade: [If needed, to 128GB]
-- [ ] [Network upgrade: 10Gb Ethernet]
-- [ ] [UPS for power protection]
-- [ ] [Additional GPU for ML workloads]
-
-## Hardware Procurement
-
-### Vendors
-
-**Primary sources**:
-- [Where you buy hardware, e.g., Newegg, Amazon, eBay]
-- Used/refurb market for server hardware
-- Local stores for immediate needs
-
-### Budget
-
-**Annual hardware budget**: $[Amount]
-**Priority allocation**:
-1. Storage expansion (data growth)
-2. RAM (VM capacity)
-3. Backup solutions (external drives)
-4. Network improvements
-
-## Hardware Maintenance
-
-### Cleaning Schedule
-
-- **Dust cleaning**: Every 3 months
-- **Cable management**: As needed
-- **Fan inspection**: Every 6 months
-
-### Monitoring
-
-```bash
-# CPU temperature
-sensors
-
-# Disk health
-smartctl -a /dev/sdX
-
-# RAM testing
-# Run memtest86+ annually
-
-# GPU temperature
-nvidia-smi  # On VMs with passthrough
-```
-
-### Replacement Policy
-
-**Drives**:
-- Replace when S.M.A.R.T. warnings appear
-- Proactive replacement at 5 years
-- Keep spare drive on hand
-
-**Fans**:
-- Replace when noisy or failing
-- Cheap and easy to replace
-
-**RAM**:
-- Test if system instability occurs
-- Replace faulty modules immediately
-
-**Other components**:
-- Monitor and replace as needed
-- Keep critical spares (PSU, cables)
-
-## Power & Cooling
-
-### Power Management
-
-**UPS** (if installed):
-- Model: [Your UPS model]
-- Capacity: [VA rating]
-- Runtime: [Estimated runtime]
-- Connected devices: [What's on UPS]
-
-**Power consumption**:
-- deadmall server: [Watts]
-- Raspberry Pi: ~5W
-- Network equipment: [Watts]
-- Total: [Watts]
-- Monthly cost (at $[rate]/kWh): $[amount]
-
-### Cooling
-
-**Ambient temperature**: [Your room temp]
-**Case airflow**: [Your airflow configuration]
-**Monitoring**: Temperature sensors on critical components
-
-## Warranty & Support
-
-| Component | Purchase Date | Warranty Until | Notes |
-|-----------|---------------|----------------|-------|
-| [Component] | [Date] | [Date] | [Extended warranty, etc.] |
-| [Component] | [Date] | [Date] | [Notes] |
-
-## Decommissioned Hardware
-
-Document hardware you've replaced or retired:
-
-| Hardware | Decommission Date | Reason | Disposition |
-|----------|------------------|---------|-------------|
-| [Old component] | [Date] | [Reason] | [Sold/recycled/spare] |
-
-## Hardware Documentation
-
-### Manuals & Documentation
-
-- [Links to manufacturer documentation]
-- [Driver downloads]
-- [BIOS/firmware updates]
-
-### Configuration Backups
-
-- BIOS settings: [Documented or screenshot]
-- Network config: [Backed up]
-- RAID config: [Documented]
+### Why Virtualized Pi-hole?
+**Migration**: Moved from physical Raspberry Pi to Proxmox VM (ID 101).
+- **Benefit**: Faster DNS resolution due to x86 processor speed vs ARM.
+- **Reliability**: Eliminates SD card corruption risks associated with physical Raspberry Pis.
+- **Snapshots**: Allows for instant rollback before applying blocklist updates.
+<!-- Local Variables: -->
+<!-- gptel-model: claude-haiku-4-5-20251001 -->
+<!-- gptel--backend-name: "Claude-Haiku-4.5" -->
+<!-- gptel-max-tokens: 6000 -->
+<!-- gptel--bounds: nil -->
+<!-- End: -->

@@ -4,15 +4,13 @@ Complete network architecture documentation for the homelab infrastructure.
 
 ## Network Overview
 
-- **Network**: 192.168.1.0/24 (255.255.255.0)
-- **Gateway**: 192.168.1.1
-- **DNS**: Pi-hole (192.168.1.X) → Upstream (8.8.8.8, 1.1.1.1)
-- **DHCP**: Router (192.168.1.1) or Pi-hole
-- **Local Domain**: .bear
-- **VPN**: Tailscale mesh network overlay
+- **Subnet**: `192.168.1.0/24`
+- **Gateway**: `192.168.1.1`
+- **DNS**: Pi-hole (`192.168.1.15`) → Cloudflare (`1.1.1.1`)
+- **Domain**: `.bear` (Local), `[External Domain]` (Public)
+- **Overlay Network**: ZeroTier (`10.147.17.x`)
 
 ## Network Diagram
-
 ```
                          Internet
                              ↓
@@ -42,35 +40,49 @@ Complete network architecture documentation for the homelab infrastructure.
 
 ## IP Address Allocation
 
-### Infrastructure
+### Physical Infrastructure
 
-| Device | IP Address | MAC Address | Hostname | Purpose |
-|--------|------------|-------------|----------|---------|
-| Router | 192.168.1.1 | [MAC] | gateway | Internet gateway, DHCP, NAT |
-| Proxmox Host | 192.168.1.29 | [MAC] | deadmall.bear | Hypervisor |
-| Raspberry Pi | 192.168.1.X | [MAC] | pi.bear | Pi-hole, Home Assistant |
+| Device | Hostname | IP Address | Interface | Purpose |
+|--------|----------|------------|-----------|---------|
+| **Router** | `gateway` | `192.168.1.1` | LAN | Internet Gateway / Firewall |
+| **Proxmox Host** | `deadmall` | `192.168.1.29` | vmbr0 | Hypervisor / ZFS Storage |
+| **Raspberry Pi 5** | `emacs-pi` | `192.168.1.26` | eth0 | Dedicated Writing Station |
+| **Workstation** | `main-pc` | `192.168.1.38` | eth0 | Audio Production / General |
 
-### Virtual Machines
+### Virtual Infrastructure (Active)
 
-| VM Name | IP Address | MAC Address | Hostname | vCPU | RAM |
-|---------|------------|-------------|----------|------|-----|
-| emacsOS | 192.168.1.X | [MAC] | emacs.bear | 4 | 8GB |
-| Nextcloud | 192.168.1.19 | [MAC] | cloud.bear | 6 | 16GB |
-| Plex | 192.168.1.X | [MAC] | plex.bear | 4 | 8GB |
-| Ollama | 192.168.1.X | [MAC] | ollama.bear | [X] | [XGB] |
-| Stable Diffusion | 192.168.1.X | [MAC] | sd.bear | [X] | [XGB] |
-| Audio Production | 192.168.1.X | [MAC] | audio.bear | 8+ | 24GB+ |
+| VMID | Service | Hostname | IP Address | Resource Allocation |
+|------|---------|----------|------------|---------------------|
+| **101** | **Pi-hole** | `pihole.bear` | `192.168.1.15` | 4GB RAM / 20GB Disk |
+| **102** | **Nextcloud** | `cloud.bear` | `192.168.1.19` | 12GB RAM / 1TB Disk |
+| **100** | **Plex** | `plex.bear` | `192.168.1.40` | 4GB RAM / 32GB Disk |
+| **200** | **Ollama** | `ollama.bear` | `192.168.1.50` | CT / Host GPU |
+| **105** | **Wiki** | `wiki.bear` | `192.168.1.18` | CT / Shared |
+| **106** | **Forest Creatures** | `forest.bear` | *DHCP* | 4GB RAM / 64GB Disk |
+| **107** | **Home Assistant** | `hass.bear` | *Internal* | 4GB RAM / 32GB Disk |
 
-### Reserved Ranges
+### Overlay Network (ZeroTier)
 
-- **192.168.1.1-10**: Infrastructure (router, Pi-hole, etc.)
-- **192.168.1.11-50**: Static VMs and servers
-- **192.168.1.51-100**: DHCP pool (dynamic clients)
-- **192.168.1.101-200**: IoT and smart home devices
-- **192.168.1.201-254**: Reserved for future use
+| Device | Managed IP | Status |
+|--------|------------|--------|
+| **Proxmox Host** | `10.147.17.50` | Active |
+| **Remote Client** | `10.147.17.15` | Active |
+| **Mobile** | `10.147.17.x` | Active |
 
 ## DNS Configuration
 
+### Local DNS Strategy
+1. **Primary**: Pi-hole (`192.168.1.15`) handles all internal `.bear` requests.
+2. **Filtering**: Blocks ads and telemetry at the network level.
+3. **Upstream**: Unmatched requests forwarded to Cloudflare (`1.1.1.1`).
+
+### Local Records (.bear)
+```text
+proxmox.bear  → 192.168.1.29
+cloud.bear    → 192.168.1.19
+plex.bear     → 192.168.1.40
+wiki.bear     → 192.168.1.18
+ollama.bear   → 192.168.1.50
 ### Local DNS (.bear domain)
 
 **Pi-hole local records**:
@@ -216,7 +228,7 @@ IN DROP                       # Drop all other incoming
 1. **Perimeter**: Router firewall (block incoming)
 2. **Network**: Segmentation via VLANs (if configured)
 3. **Host**: Proxmox firewall per VM
-4. **Application**: Service-level authentication
+4. **Application**: Service-level authentication 
 
 **Access Control**:
 - No direct Internet exposure (use Tailscale)
@@ -307,31 +319,15 @@ dig cloud.bear
 nslookup cloud.bear
 ```
 
-## Network Documentation
-
-### Physical Layout
-
-**Rack/Location**:
-- Proxmox server: [Physical location]
-- Raspberry Pi: [Physical location]
-- Router: [Physical location]
-- Switch: [Physical location]
-
-**Cabling**:
-- Cat6 Ethernet cables
-- Cable management: [Your setup]
-- Cable labeling: [Yes/No]
-
-### Configuration Backups
-
-- Router config: [Backup location/method]
-- Pi-hole config: [Backup method]
-- Proxmox network config: /etc/network/interfaces
 
 ## Future Network Plans
 
-- [ ] [10Gb Ethernet upgrade]
-- [ ] [VLAN segmentation for IoT]
-- [ ] [Redundant Internet connection]
-- [ ] [Network monitoring dashboard]
-- [ ] [IPv6 deployment]
+- [ ] New router
+- [ ] IPv6 deployment
+
+<!-- Local Variables: -->
+<!-- gptel-model: claude-haiku-4-5-20251001 -->
+<!-- gptel--backend-name: "Claude-Haiku-4.5" -->
+<!-- gptel-max-tokens: 6000 -->
+<!-- gptel--bounds: nil -->
+<!-- End: -->
